@@ -11,12 +11,12 @@ from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.views.generic import FormView
 
-logger = logging.getLogger('cookbook.custom')
+logger = logging.getLogger('everpost.custom')
 
 
 def index(request):
     if request.user.is_authenticated:
-        return render(request, 'recipes_search.html')
+        return render(request, 'recent_posts.html')
 
     return render(request, 'info.html')
 

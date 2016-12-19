@@ -8,5 +8,5 @@ urlpatterns = [
     url(r'^logout/$', logout, name='logout'),
     url(r'^register/$', RegisterFormView.as_view(), name='register'),
     url(r'', index, name='index'),
-    url(r'^recipes/', login, {'template_name': 'recipes_search.html'}, name='recipes_search'),
+    url(r'^posts/', login, {'template_name': 'recent_posts.html'}, name='recent_posts'),
 ]
