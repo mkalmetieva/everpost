@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Posts of user {{ target_author.username }}</h2>
+    <ul class="list-group post_list">
+        {% for post in posts %}
+            <li class="list-group-item">
+                <a class="post_title" href="#"><span>{{ post.title }} </span></a>
+               <span class="post_create_time">{{ post.created_at|date: 'd-m-Y H:M' }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <a href="{% url 'user_posts' key=request.author.id %}">Go to my posts</a>
+    <form method="POST" class="post_form">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{% url 'my_posts' %}">Go to my posts</a>
+                <h1>Deleting</h1>
+                <h3>Are you sure you want to delete post {{ post.title }}?</h3>
+                <button type="submit" class="save btn btn-default">Yes, delete</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <a href="{% url 'user_posts' key=request.author.id %}">Go to my posts</a>
+    <form method="POST" class="post_form" enctype="multipart/form-data">
+        {% if action == 'add' %}
+            <h1>Add post</h1>
+        {% else %}
+            <h1>Edit post</h1>
+        {% endif %}
+
+        {{ form.as_p }}
+
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <a href="{% url 'recent_posts' %}">Go to recent posts</a>
+            {% if post.author == request.user %}
+                <a href="{% url 'user_posts' key=request.author.id %}">Go to my posts</a>
+            {% endif %}
+            <h1>{{ post.title }}</h1>
+            <p>{{ post.text|linebreaksbr }}</p>
+        </div>
+    </div>
+
+    {% if post.author == request.user %}
+        <div class="row">
+            <a href="{% url 'post_edit' key=post.id %}">Edit</a>
+            <a href="{% url 'post_delete' key=post.id %}">Delete</a>
+        </div>
+    {% endif %}
+
+{% endblock %}

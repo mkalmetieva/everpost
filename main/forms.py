@@ -3,6 +3,8 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.forms import UsernameField
 from django.contrib.auth.models import User
 
+from main.models import Post
+
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -52,3 +54,10 @@ class UserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class PostForm(forms.Form):
+    class Meta:
+        model = Post
+        fields = ('title', 'text')
+        field_classes = {'title': forms.CharField, 'text': forms.CharField}

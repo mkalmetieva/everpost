@@ -1,5 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    Search for recipes.
+    <h2>Posts</h2>
+    {% if request.user.is_authenticated %}
+        <div class="row">
+            <a href="{% url 'user_posts' key=request.user.id %}">Go to my posts</a>
+            <a href="{% url 'post_add' %}">Add new post</a>
+        </div>
+    {% endif %}
+
+    {% if posts %}
+        <ul class="list-group post_list">
+            {% for post in posts %}
+                <li class="list-group-item">
+                    <a class="post_title" href="#"><span>{{ post.title }} </span></a>
+                    <span class="post_author">{{ post.author.username }}</span>
+                    <span class="post_create_time">{{ post.created_at }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <span>Sorry, no posts found :(</span>
+    {% endif %}
 {% endblock %}
