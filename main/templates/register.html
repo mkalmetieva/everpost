@@ -14,24 +14,23 @@
                 <div class="main-login-form">
                     <div class="login-group">
                         <div class="form-group">
+                            {{ form.username.errors }}
                             <label for="username" class="sr-only">Email address</label>
                             <input type="text" class="form-control" id="username" name="username"
                                    placeholder="username">
                         </div>
                         <div class="form-group">
+                            {{ form.password1.errors }}
                             <label for="password" class="sr-only">Password</label>
-                            <input type="password" class="form-control" id="password" name="password"
+                            <input type="password" class="form-control" id="password1" name="password1"
                                    placeholder="password">
                         </div>
                         <div class="form-group">
+                            {{ form.password2.errors }}
                             <label for="password_confirm" class="sr-only">Password Confirm</label>
-                            <input type="password" class="form-control" id="password_confirm" name="password_confirm"
+                            <input type="password" class="form-control" id="password2"
+                                   name="password2"
                                    placeholder="confirm password">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email" class="sr-only">Email</label>
-                            <input type="text" class="form-control" id="mail" name="email" placeholder="email">
                         </div>
 
                     </div>
