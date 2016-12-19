@@ -1,0 +1,21 @@
+{% load staticfiles %}
+<nav class="navbar navbar-default navbar-custom">
+    <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+            <li><a class="icon-item"
+                   href="{% url 'index' %}"><img src="{% static 'img/cookbook.png' %}"/></a>
+            </li>
+            <li><a href="{% url 'index' %}">Cookbook</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            {% if request.user.is_authenticated %}
+                <li><a class="username-item" href="#">{{ request.user.username }} </a></li>
+                <li>
+                    <a href="{% url 'logout' %}?next=/">Log out</a>
+            {% else %}
+                <li><a href="{% url 'login' %}">Log in</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
