@@ -53,7 +53,9 @@ def add_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
         if form.is_valid():
-            post_item = form.save()
+            post_item = form.save(commit=False)
+            post_item.author = request.user
+            post_item.save()
             return redirect('post_view', pk=post_item.pk)
     else:
         form = PostForm(instance=Post())
@@ -71,11 +73,14 @@ def edit_post(request, pk):
     if request.method == 'POST':
         post_form = PostForm(request.POST)
         if post_form.is_valid():
+            new_post_item = post_form.save(commit=False)
+            post_item.title = new_post_item.title
+            post_item.text = new_post_item.text
             post_item.save()
             return redirect('post_view', pk=post_item.pk)
     else:
         post_form = PostForm(instance=post_item)
-    return render(request, 'post_edit.html', {'post': post_form, 'action': 'edit'})
+    return render(request, 'post_edit.html', {'form': post_form, 'action': 'edit'})
 
 
 @login_required(login_url='/login/')
@@ -88,10 +93,10 @@ def delete_post(request, pk):
         )
     if request.method == "POST":
         post_item.delete()
-        return redirect('my_posts')
-    return render(request, 'post_delete.html', {'post': PostForm(instance=post_item)})
+        return redirect('user_posts', pk=request.user.id)
+    return render(request, 'post_delete.html', {'form': PostForm(instance=post_item)})
 
 
 def view_post(request, pk):
     post_item = get_object_or_404(Post, pk=pk)
-    return render(request, 'post_view.html', {'post': PostForm(instance=post_item)})
+    return render(request, 'post_view.html', {'post': post_item})

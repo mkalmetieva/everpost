@@ -359,14 +359,11 @@ label:hover:before {
 
 }
 
-.post_list > .post_title {
-
+.post_title {
+    font-weight: bold;
 }
 
-.post_list > .post_create_time {
-
-}
-
-.post_list > .post_author {
-
+.post_create_time {
+    display: block;
+    text-align: right;
 }
