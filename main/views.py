@@ -1,5 +1,4 @@
 import logging
-from time import timezone
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -41,32 +40,29 @@ def get_recent_posts(request):
 
 
 @login_required(login_url='/login/')
-def get_user_posts(request, key):
-    user = get_object_or_404(User, pk=key)
+def get_user_posts(request, pk):
+    user = get_object_or_404(User, pk=pk)
     page = request.GET.get('page', 0)
     posts = Post.objects.filter(author=user).order_by('-created_at')[
             page * DEFAULT_PAGE_SIZE:(page + 1) * DEFAULT_PAGE_SIZE]
-    return render(request, 'recent_posts.html', {'posts': posts, 'target_user': user})
+    return render(request, 'user_posts.html', {'posts': posts, 'target_user': user})
 
 
 @login_required(login_url='/login/')
 def add_post(request):
-    post_item = Post()
     if request.method == 'POST':
-        post_item.title = request.POST['title']
-        post_item.text = request.POST['text']
-        post_item.author = request.user
-        post_item.created_date = timezone.now()
-        post_item.save()
-
-        return redirect('post_view', pk=post_item.pk)
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post_item = form.save()
+            return redirect('post_view', pk=post_item.pk)
     else:
-        return render(request, 'post_edit.html', {'post': post_item, 'action': 'add'})
+        form = PostForm(instance=Post())
+    return render(request, 'post_edit.html', {'form': form, 'action': 'add'})
 
 
 @login_required(login_url='/login/')
-def edit_post(request, key):
-    post_item = get_object_or_404(Post, pk=key)
+def edit_post(request, pk):
+    post_item = get_object_or_404(Post, pk=pk)
     if post_item.author != request.user:
         raise ValidationError(
             'You are not the owner of the post',
@@ -78,13 +74,13 @@ def edit_post(request, key):
             post_item.save()
             return redirect('post_view', pk=post_item.pk)
     else:
-        post_form = PostForm(post_item)
+        post_form = PostForm(instance=post_item)
     return render(request, 'post_edit.html', {'post': post_form, 'action': 'edit'})
 
 
 @login_required(login_url='/login/')
-def delete_post(request, key):
-    post_item = get_object_or_404(Post, pk=key)
+def delete_post(request, pk):
+    post_item = get_object_or_404(Post, pk=pk)
     if post_item.author != request.user:
         raise ValidationError(
             'You are not the owner of the post',
@@ -93,9 +89,9 @@ def delete_post(request, key):
     if request.method == "POST":
         post_item.delete()
         return redirect('my_posts')
-    return render(request, 'post_delete.html', {'post': PostForm(post_item)})
+    return render(request, 'post_delete.html', {'post': PostForm(instance=post_item)})
 
 
-def view_post(request, key):
-    post_item = get_object_or_404(Post, pk=key)
-    return render(request, 'post_view.html', {'post': PostForm(post_item)})
+def view_post(request, pk):
+    post_item = get_object_or_404(Post, pk=pk)
+    return render(request, 'post_view.html', {'post': PostForm(instance=post_item)})

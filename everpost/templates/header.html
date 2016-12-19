@@ -5,14 +5,18 @@
             <li><a class="icon-item"
                    href="{% url 'index' %}"><img src="{% static 'img/everpost.png' %}"/></a>
             </li>
-            <li><a href="{% url 'index' %}">everpost</a></li>
+            <li><a href="{% url 'index' %}">Everpost</a></li>
+            {% if request.user.is_authenticated %}
+                <li><a href="{% url 'user_posts' pk=request.user.id %}">My posts</a></li>
+                <li><a href="{% url 'post_add' %}">Add post</a></li>
+            {% endif %}
         </ul>
         <ul class="nav navbar-nav navbar-right">
             {% if request.user.is_authenticated %}
                 <li><a class="username-item" href="#">{{ request.user.username }} </a></li>
                 <li>
                     <a href="{% url 'logout' %}?next=/">Log out</a>
-            {% else %}
+                    {% else %}
                 <li><a href="{% url 'login' %}">Log in</a></li>
                 <li><a href="{% url 'register' %}">Register</a></li>
             {% endif %}

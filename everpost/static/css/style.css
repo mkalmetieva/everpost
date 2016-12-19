@@ -351,6 +351,10 @@ label:hover:before {
     font-weight: bold;
 }
 
+.post_list_section {
+    padding-top: 2em;
+}
+
 .post_list {
 
 }

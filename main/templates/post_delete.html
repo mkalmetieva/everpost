@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <a href="{% url 'user_posts' key=request.author.id %}">Go to my posts</a>
+    <a href="{% url 'user_posts' pk=request.author.id %}">Go to my posts</a>
     <form method="POST" class="post_form">
         {% csrf_token %}
         <div class="row">

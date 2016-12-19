@@ -56,8 +56,9 @@ class UserCreationForm(forms.ModelForm):
         return user
 
 
-class PostForm(forms.Form):
+class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('title', 'text')
-        field_classes = {'title': forms.CharField, 'text': forms.CharField}
+        field_classes = {'title': forms.CharField,
+                         'text': forms.CharField}
