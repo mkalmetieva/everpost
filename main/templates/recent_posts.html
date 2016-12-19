@@ -10,7 +10,8 @@
                     <li class="list-group-item">
                         <a class="post_title"
                            href="{% url 'post_view' pk=post.id %}"><span>{{ post.title }} </span></a>
-                        <span class="post_author">{{ post.author.username }}</span>
+                        by <a class="post_title"
+                              href="{% url 'user_posts' pk=post.author.id %}">{{ post.author.username }}</a>
                         <span class="post_create_time">{{ post.created_at }}</span>
                     </li>
                 {% endfor %}
