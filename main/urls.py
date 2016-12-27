@@ -2,6 +2,7 @@ from django.conf.urls import url
 from django.contrib.auth.views import login, logout
 
 from main import views
+from main.rest_views import CommentsViewSet
 from main.views import nicedit_upload
 
 urlpatterns = [
@@ -16,5 +17,7 @@ urlpatterns = [
     url(r'^post/edit/(?P<pk>[0-9]+)/$', views.edit_post, name='post_edit'),
     url(r'^post/delete/(?P<pk>[0-9]+)/$', views.delete_post, name='post_delete'),
 
-    url(r'^upload/$', nicedit_upload, name='nicedit_upload')
+    url(r'^upload/$', nicedit_upload, name='nicedit_upload'),
+
+    url('^post/(?P<post_pk>.+)/comments$', CommentsViewSet.as_view(), name='post_comments'),
 ]

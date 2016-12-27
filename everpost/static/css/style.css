@@ -351,6 +351,10 @@ label:hover:before {
     font-weight: bold;
 }
 
+.container {
+    margin-bottom: 4em;
+}
+
 .post_list_section {
     padding-top: 2em;
 }
@@ -366,4 +370,39 @@ label:hover:before {
 .post_create_time {
     display: block;
     text-align: right;
+}
+
+.post-text {
+    border: 1px solid #aaaaaa;
+    border-radius: 4px;
+    padding: 1em 2em;
+    margin-top: 1em;
+}
+
+.comment-panel {
+    border: 1px solid #aaaaaa;
+    border-radius: 4px;
+    background-color: #fff8ea;
+    padding: 1em 2em;
+    margin-top: 1em;
+}
+
+#comment-template {
+    display: none;
+}
+
+.invisible {
+    display: none;
+}
+
+#new-comment-text {
+    width: 100%;
+}
+
+#post-section {
+    margin-bottom: 4em;
+}
+
+#clear-reply-button {
+    cursor: pointer;
 }

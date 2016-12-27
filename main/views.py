@@ -42,7 +42,6 @@ def get_recent_posts(request):
     return render(request, 'recent_posts.html', {'posts': posts})
 
 
-@login_required(login_url='/login/')
 def get_user_posts(request, pk):
     user = get_object_or_404(User, pk=pk)
     page = request.GET.get('page', 0)

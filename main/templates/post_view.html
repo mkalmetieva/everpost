@@ -1,21 +1,237 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
+{% block js %}
+    <script src="{% static 'django_js_reverse/js/reverse.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
-    <div class="row">
-        <div class="col-md-6">
-            <h2>{{ post.title }} by <a class="post_title"
-                                       href="{% url 'user_posts' pk=post.author.id %}">{{ post.author.username }}</a>
-            </h2>
-            <p>{{ post.text | safe }}</p>
+    <div id="post-section" class="row">
+        <div class="col-md-10 col-md-offset-1 post-panel">
+            <h2>{{ post.title }} </h2>
+            <div>
+                <span>by </span>
+                <a class="post_title"
+                   href="{% url 'user_posts' pk=post.author.id %}">{{ post.author.username }}</a>
+                {% if post.author == request.user %}
+                    <a class="btn btn-default" href="{% url 'post_edit' pk=post.id %}">Edit</a>
+                    <a class="btn btn-default" href="{% url 'post_delete' pk=post.id %}">Delete</a>
+                {% endif %}
+            </div>
+            <div class="post-text">{{ post.text | safe }}</div>
         </div>
     </div>
 
-    {% if post.author == request.user %}
-        <div class="row">
-            <a class="btn btn-default" href="{% url 'post_edit' pk=post.id %}">Edit</a>
-            <a class="btn btn-default" href="{% url 'post_delete' pk=post.id %}">Delete</a>
+    <div id="comments-section" class="row">
+        <div class="col-md-5 col-md-offset-1">
+            <h4>Comments</h4>
+            <div id="no-comments-placeholder" class="invisible">No comments yet :(</div>
+            <div id="comments-panel">
+                <div id="comment-template" class="comment-panel">
+                    <div class="author-reference">
+                        <span> by </span>
+                        <a class="author-link"></a>
+                        <span> at </span>
+                        <span class="comment-time"></span>
+                        <button class="btn btn-default reply-button invisible">Reply</button>
+                        <button class="btn btn-default delete-comment-button invisible">Delete</button>
+                    </div>
+                    <div class="parent-comment-reference"><span> as a reply to </span><a
+                            class="parent-comment-link"></a></div>
+                    <div class="comment-text"></div>
+                </div>
+            </div>
         </div>
-    {% endif %}
+
+        <div id="new-comment-panel" class="col-md-5 invisible">
+            <h4>New comment</h4>
+            <div id="new-comment" class="comment-panel">
+                <form id="new-comment-form" method="POST">
+                    {% csrf_token %}
+                    <div class="parent-comment-reference">
+                        <span> as a reply to </span>
+                        <a class="parent-comment-link"></a>
+                        <span id="clear-reply-button" class="fa fa-window-close" aria-hidden="true"></span>
+                    </div>
+                    <textarea id="new-comment-text" title="Text" name="text" required></textarea>
+                    <button type="submit" class="btn btn-default">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var postId = {{ post.id }};
+        {% if request.user.is_authenticated %}
+            var currentUserId = "{{ request.user.id }}";
+        {% else %}
+            var currentUserId = null;
+        {% endif %}
+
+        var comments = {};
+
+        $(function () {
+            $.get("{% url 'post_comments' post_pk=post.id %}", function (data) {
+                if (data.results.length == 0) {
+                    $('#no-comments-placeholder').toggleClass('invisible');
+                }
+
+                for (var i = 0; i < data.results.length; i++) {
+                    var item = data.results[i];
+                    addCommentItem(item);
+                }
+            });
+
+            if (currentUserId) {
+                var panel = $('#new-comment-panel');
+                panel.removeClass('invisible');
+                $(panel).find('.parent-comment-reference').toggleClass('invisible');
+                $('#new-comment-form').submit(addNewComment);
+                $('#clear-reply-button').click(clearReply);
+            }
+
+            $('.parent-comment-link').click(function (e) {
+                var commentRef = $(e.target).attr('href');
+                $(commentRef).effect("highlight", {color: '#ffc060'}, 1000);
+            });
+
+            function addCommentItem(item) {
+                var comment = new CommentModel(item);
+                comments[comment.id] = comment;
+
+                var template = fillCommentTemplate(comment);
+                template.appendTo("#comments-panel");
+                template.show();
+            }
+
+            function fillCommentTemplate(comment) {
+                var template = $("#comment-template").clone();
+                template.attr("id", "comment-" + comment.id);
+
+                if (comment.author.id) {
+                    var authorLink = $(template).find('.author-link');
+                    authorLink.text(comment.author.username);
+                    authorLink.attr('href', Urls.user_posts(comment.author.id));
+
+                    $(template).find('.comment-time').text(comment.getCreatedAtString());
+
+                    if (currentUserId == comment.author.id) {
+                        var deleteCommentButton = $(template).find('.delete-comment-button');
+                        deleteCommentButton.click(deleteComment);
+                        deleteCommentButton.removeClass('invisible');
+                    }
+
+                    if (currentUserId) {
+                        var replyButton = $(template).find('.reply-button');
+                        replyButton.click(reply);
+                        replyButton.removeClass('invisible')
+                    }
+                } else {
+                    $(template).find('.author-reference').addClass('invisible');
+                }
+
+                var parentCommentLink = $(template).find('parent-comment-link');
+                if (comment.parentCommentId != null) {
+                    parentCommentLink.text(comment.author.username);
+                    parentCommentLink.attr('href', '#comment-' + comment.parentCommentId);
+                } else {
+                    $(template).find('.parent-comment-reference').addClass('invisible');
+                }
+
+                $(template).find('.comment-text').text(comment.text);
+
+                return template;
+            }
+
+            function deleteComment() {
+                var commentPanel = $(this).closest('.comment-panel');
+                var targetId = commentPanel.attr('id').replace('comment-', '');
+                $.ajax({
+                    url: Urls.delete_post(targetId),
+                    type: 'DELETE',
+                    success: function (result) {
+                        delete comments[targetId];
+                        commentPanel.remove();
+                    },
+                    error: function (result) {
+                        alert(result);
+                    }
+                });
+            }
+
+            function reply() {
+                var commentPanel = $(this).closest('.comment-panel');
+                var targetId = commentPanel.attr('id').replace('comment-', '');
+
+                var newCommentPanel = $('#new-comment');
+                var parentCommentLink = newCommentPanel.find('.parent-comment-link');
+                parentCommentLink.attr('href', '#comment-' + targetId);
+                parentCommentLink.text(comments[targetId].author.username);
+                newCommentPanel.find('.parent-comment-reference').removeClass('invisible');
+
+                newCommentPanel.effect("highlight", {color: '#ffc060'}, 1500);
+                window.location.hash = '#new-comment';
+            }
+
+            function clearReply() {
+                var newCommentPanel = '#new-comment';
+                $(newCommentPanel).find('.parent-comment-link').removeAttr('href');
+                $(newCommentPanel).find('.parent-comment-reference').addClass('invisible');
+            }
+
+            function addNewComment() {
+                var comment = new CommentModel({});
+                comment.text = $('#new-comment-text').text();
+                var parentCommentRef = $('#new-comment-form').find('.parent-comment-link').attr('href');
+                comment.parentCommentId = parentCommentRef ? parentCommentRef.replace('#comment-', '') : null;
+
+                $.ajax({
+                    url: Urls.add_post(),
+                    data: {text: comment.text, 'parent_comment': comment.parentCommentId, 'post': postId},
+                    type: 'POST',
+                    success: function (result) {
+                        addCommentItem(result);
+                    },
+                    error: function (result) {
+                        alert(result);
+                    }
+                });
+
+                return false;
+            }
+        });
+
+        function CommentModel(data) {
+            var self = this;
+
+            self.id = data.id ? data.id : null;
+            self.text = data.text ? data.text : null;
+            self.author = data.author ? data.author : null;
+            self.createdAt = data.created_at ? new Date(data.created_at) : null;
+            self.parentCommentId = data.parent_comment ? data.parent_comment : null;
+
+            self.getCreatedAtString = function () {
+                if (!self.createdAt) {
+                    return null;
+                }
+                var dateString = getDateString(self.createdAt);
+                var timeString = getTime(self.createdAt);
+                return dateString == getDateString(new Date())
+                        ? timeString
+                        : dateString + " " + timeString;
+            };
+
+            function getDateString(d) {
+                return d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear();
+            }
+
+            function getTime(d) {
+                return d.getHours() + ":" + d.getMinutes();
+            }
+
+        }
+    </script>
 
 {% endblock %}
