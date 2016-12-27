@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UsernameField
 from django.contrib.auth.models import User
 
 from main.models import Post, NicEditImage
+from main.utils import sanitize_html
 from main.widgets import NicEditWidget
 
 
@@ -62,6 +63,11 @@ class PostForm(forms.ModelForm):
             'text': NicEditWidget(attrs={'style': 'width: 800px;'}),
         }
         fields = ('title', 'text')
+
+    def clean_text(self):
+        text = self.cleaned_data.get("text")
+        sanitized_text = sanitize_html(text)
+        return sanitized_text
 
 
 class NicEditImageForm(forms.ModelForm):
