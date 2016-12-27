@@ -11,3 +11,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class NicEditImage(models.Model):
+    image = models.ImageField(upload_to='nicedit/')

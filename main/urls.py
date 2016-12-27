@@ -2,6 +2,7 @@ from django.conf.urls import url
 from django.contrib.auth.views import login, logout
 
 from main import views
+from main.views import nicedit_upload
 
 urlpatterns = [
     url(r'^login/$', login, {'template_name': 'login.html', 'redirect_authenticated_user': True}, name='login'),
@@ -13,5 +14,7 @@ urlpatterns = [
     url(r'^post/(?P<pk>[0-9]+)/$', views.view_post, name='post_view'),
     url(r'^post/add/$', views.add_post, name='post_add'),
     url(r'^post/edit/(?P<pk>[0-9]+)/$', views.edit_post, name='post_edit'),
-    url(r'^post/delete/(?P<pk>[0-9]+)/$', views.delete_post, name='post_delete')
+    url(r'^post/delete/(?P<pk>[0-9]+)/$', views.delete_post, name='post_delete'),
+
+    url(r'^upload/$', nicedit_upload, name='nicedit_upload')
 ]

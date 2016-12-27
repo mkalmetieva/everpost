@@ -1,13 +1,16 @@
 import logging
 
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 
-from main.forms import PostForm
+from main.forms import PostForm, NicEditImageForm
 from main.models import Post
 
 DEFAULT_PAGE_SIZE = 10
@@ -100,3 +103,29 @@ def delete_post(request, pk):
 def view_post(request, pk):
     post_item = get_object_or_404(Post, pk=pk)
     return render(request, 'post_view.html', {'post': post_item})
+
+
+def nicedit_upload(request):
+    if not request.user.is_authenticated():
+        json_data = json.dumps({
+            'success': False,
+            'errors': {'__all__': 'Authentication required'}})
+        return HttpResponse(json_data, content_type='application/json')
+
+    form = NicEditImageForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        image = form.save()
+        json_data = json.dumps({
+            'success': True,
+            'upload': {
+                'links': {
+                    'original': image.image.url},
+                'image': {
+                    'width': image.image.width,
+                    'height': image.image.height}
+            }
+        })
+    else:
+        json_data = json.dumps({
+            'success': False, 'errors': form.errors})
+    return HttpResponse(json_data, content_type='application/json')

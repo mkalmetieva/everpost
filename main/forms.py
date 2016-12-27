@@ -3,7 +3,8 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.forms import UsernameField
 from django.contrib.auth.models import User
 
-from main.models import Post
+from main.models import Post, NicEditImage
+from main.widgets import NicEditWidget
 
 
 class UserCreationForm(forms.ModelForm):
@@ -57,6 +58,13 @@ class UserCreationForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
+        widgets = {
+            'text': NicEditWidget(attrs={'style': 'width: 800px;'}),
+        }
         fields = ('title', 'text')
-        field_classes = {'title': forms.CharField,
-                         'text': forms.CharField}
+
+
+class NicEditImageForm(forms.ModelForm):
+    class Meta:
+        model = NicEditImage
+        fields = '__all__'

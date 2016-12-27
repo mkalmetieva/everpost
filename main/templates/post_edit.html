@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
+{% block js %}
+    {{ form.media }}
+{% endblock %}
+
 {% block content %}
-    <form method="POST" class="post_form" enctype="multipart/form-data">
+    <form id="edit_form" method="POST" class="post_form" enctype="multipart/form-data">
         {% csrf_token %}
         {% if action == 'add' %}
             <h1>Add post</h1>
@@ -13,4 +17,18 @@
 
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
+
+    <script>
+        $(function () {
+            $('#edit_form textarea').prop('required', false);
+
+            $("#edit_form button[type=submit]").click(function () {
+                textEditor = nicEditors.findEditor('id_text');
+                if (textEditor.getContent() != '<br>') {
+                    $('#edit_form textarea').text(textEditor.getContent());
+                }
+            });
+            return true;
+        });
+    </script>
 {% endblock %}
