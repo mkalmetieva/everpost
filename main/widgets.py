@@ -25,7 +25,6 @@ class NicEditWidget(forms.Textarea):
                                          'center',
                                          'right',
                                          'justify',
-                                         'image',
                                          'upload',
                                          'link',
                                          'ol',

@@ -1,6 +1,5 @@
-import logging
-
 import json
+import logging
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -12,6 +11,7 @@ from django.views.generic import FormView
 
 from main.forms import PostForm, NicEditImageForm
 from main.models import Post
+from main.utils import resize_if_needed
 
 DEFAULT_PAGE_SIZE = 10
 
@@ -115,6 +115,7 @@ def nicedit_upload(request):
     form = NicEditImageForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         image = form.save()
+        resize_if_needed(image.image.file)
         json_data = json.dumps({
             'success': True,
             'upload': {
