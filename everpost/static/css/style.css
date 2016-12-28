@@ -432,3 +432,7 @@ Loader
 .centered {
     margin: 2em auto;
 }
+
+.fresh {
+    background-color: #c6ff99;
+}
