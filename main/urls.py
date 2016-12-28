@@ -1,9 +1,14 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib.auth.views import login, logout
+from rest_framework import routers
 
 from main import views
-from main.rest_views import CommentsViewSet
+from main.rest_views import PostCommentsView, CommentsViewSet
 from main.views import nicedit_upload
+
+router = routers.DefaultRouter()
+router.register(r'comments', CommentsViewSet, base_name='comments'),
+# router.register(r'^api/comments/(?P<pk>[0-9]+)/$', CommentsViewSet.as_view{''}, base_name='delete_comment'),
 
 urlpatterns = [
     url(r'^login/$', login, {'template_name': 'login.html', 'redirect_authenticated_user': True}, name='login'),
@@ -19,5 +24,6 @@ urlpatterns = [
 
     url(r'^upload/$', nicedit_upload, name='nicedit_upload'),
 
-    url('^post/(?P<post_pk>.+)/comments$', CommentsViewSet.as_view(), name='post_comments'),
+    url(r'^api/', include(router.urls)),
+    url(r'^api/post/(?P<post_pk>.+)/comments$', PostCommentsView.as_view(), name='post_comments'),
 ]

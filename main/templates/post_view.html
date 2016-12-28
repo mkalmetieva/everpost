@@ -49,7 +49,6 @@
             <h4>New comment</h4>
             <div id="new-comment" class="comment-panel">
                 <form id="new-comment-form" method="POST">
-                    {% csrf_token %}
                     <div class="parent-comment-reference">
                         <span> as a reply to </span>
                         <a class="parent-comment-link"></a>
@@ -73,6 +72,7 @@
         var comments = {};
 
         $(function () {
+
             $.get("{% url 'post_comments' post_pk=post.id %}", function (data) {
                 if (data.results.length == 0) {
                     $('#no-comments-placeholder').toggleClass('invisible');
@@ -89,13 +89,13 @@
                 panel.removeClass('invisible');
                 $(panel).find('.parent-comment-reference').toggleClass('invisible');
                 $('#new-comment-form').submit(addNewComment);
-                $('#clear-reply-button').click(clearReply);
+                $('#clear-reply-button').click(clearRecipient);
             }
 
-            $('.parent-comment-link').click(function (e) {
+            function highlightComment(e) {
                 var commentRef = $(e.target).attr('href');
                 $(commentRef).effect("highlight", {color: '#ffc060'}, 1000);
-            });
+            };
 
             function addCommentItem(item) {
                 var comment = new CommentModel(item);
@@ -113,7 +113,7 @@
                 if (comment.author.id) {
                     var authorLink = $(template).find('.author-link');
                     authorLink.text(comment.author.username);
-                    authorLink.attr('href', Urls.user_posts(comment.author.id));
+                    authorLink.attr('href', "{% url 'user_posts' pk='0101010'%}".replace('0101010', comment.author.id));
 
                     $(template).find('.comment-time').text(comment.getCreatedAtString());
 
@@ -132,10 +132,11 @@
                     $(template).find('.author-reference').addClass('invisible');
                 }
 
-                var parentCommentLink = $(template).find('parent-comment-link');
+                var parentCommentLink = $(template).find('.parent-comment-link');
                 if (comment.parentCommentId != null) {
                     parentCommentLink.text(comment.author.username);
                     parentCommentLink.attr('href', '#comment-' + comment.parentCommentId);
+                    parentCommentLink.click(highlightComment);
                 } else {
                     $(template).find('.parent-comment-reference').addClass('invisible');
                 }
@@ -149,14 +150,17 @@
                 var commentPanel = $(this).closest('.comment-panel');
                 var targetId = commentPanel.attr('id').replace('comment-', '');
                 $.ajax({
-                    url: Urls.delete_post(targetId),
+                    url: "{% url 'comments-detail' pk='0101010'%}".replace('0101010', targetId),
                     type: 'DELETE',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
                     success: function (result) {
                         delete comments[targetId];
                         commentPanel.remove();
                     },
                     error: function (result) {
-                        alert(result);
+                        alert(result.responseText);
                     }
                 });
             }
@@ -169,13 +173,14 @@
                 var parentCommentLink = newCommentPanel.find('.parent-comment-link');
                 parentCommentLink.attr('href', '#comment-' + targetId);
                 parentCommentLink.text(comments[targetId].author.username);
+                parentCommentLink.click(highlightComment);
                 newCommentPanel.find('.parent-comment-reference').removeClass('invisible');
 
                 newCommentPanel.effect("highlight", {color: '#ffc060'}, 1500);
                 window.location.hash = '#new-comment';
             }
 
-            function clearReply() {
+            function clearRecipient() {
                 var newCommentPanel = '#new-comment';
                 $(newCommentPanel).find('.parent-comment-link').removeAttr('href');
                 $(newCommentPanel).find('.parent-comment-reference').addClass('invisible');
@@ -183,19 +188,25 @@
 
             function addNewComment() {
                 var comment = new CommentModel({});
-                comment.text = $('#new-comment-text').text();
+                comment.text = $('#new-comment-text').val();
                 var parentCommentRef = $('#new-comment-form').find('.parent-comment-link').attr('href');
                 comment.parentCommentId = parentCommentRef ? parentCommentRef.replace('#comment-', '') : null;
 
                 $.ajax({
-                    url: Urls.add_post(),
-                    data: {text: comment.text, 'parent_comment': comment.parentCommentId, 'post': postId},
+                    url: "{% url 'comments-list' %}",
+                    data: {
+                        text: comment.text, 'parent_comment': comment.parentCommentId, 'post': postId,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
                     type: 'POST',
                     success: function (result) {
                         addCommentItem(result);
+                        $('#new-comment-text').val('');
+                        clearRecipient();
+                        $('#no-comments-placeholder').addClass('invisible');
                     },
                     error: function (result) {
-                        alert(result);
+                        alert(result.responseText);
                     }
                 });
 
