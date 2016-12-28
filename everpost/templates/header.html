@@ -6,6 +6,7 @@
                    href="{% url 'index' %}"><img src="{% static 'img/everpost.png' %}"/></a>
             </li>
             <li><a href="{% url 'index' %}">Everpost</a></li>
+            <li><a href="{% url 'user_statistics_view' %}">Users</a></li>
             {% if request.user.is_authenticated %}
                 <li><a href="{% url 'user_posts' pk=request.user.id %}">My posts</a></li>
                 <li><a href="{% url 'post_add' %}">Add post</a></li>

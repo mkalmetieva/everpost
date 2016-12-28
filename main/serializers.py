@@ -51,3 +51,9 @@ class CommentSerializer(serializers.ModelSerializer):
             comment.post_id = post_id
         comment.save()
         return comment
+
+
+class UserPostStatisticsSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    username = serializers.CharField()
+    count = serializers.IntegerField()
