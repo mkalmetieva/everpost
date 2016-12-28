@@ -11,7 +11,7 @@
                         <a href="{% url 'post_view' pk=post.id %}">
                             <span class="post-title">{{ post.title }} </span>
                         </a>
-                        <span class="post-time">{{ post.created_at }}</span>
+                        <span class="post-time">{{ post.created_at | date:'d-m-Y h:i' }}</span>
                     </li>
                 {% endfor %}
             </ul>

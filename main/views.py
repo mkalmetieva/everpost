@@ -44,9 +44,7 @@ def get_recent_posts(request):
 
 def get_user_posts(request, pk):
     user = get_object_or_404(User, pk=pk)
-    page = request.GET.get('page', 0)
-    posts = Post.objects.filter(author=user).order_by('-created_at')[
-            page * DEFAULT_PAGE_SIZE:(page + 1) * DEFAULT_PAGE_SIZE]
+    posts = Post.objects.filter(author=user).order_by('-created_at')
     return render(request, 'user_posts.html', {'posts': posts, 'target_user': user})
 
 
