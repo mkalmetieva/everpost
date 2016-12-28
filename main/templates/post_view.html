@@ -43,6 +43,8 @@
                     <div class="comment-text"></div>
                 </div>
             </div>
+            <div class="loader centered"></div>
+            <button class="btn btn-default load-more invisible centered">Load more</button>
         </div>
 
         <div id="new-comment-panel" class="col-md-5 invisible">
@@ -72,30 +74,47 @@
         var comments = {};
 
         $(function () {
+            init();
+            loadComments();
 
-            $.get("{% url 'post_comments' post_pk=post.id %}", function (data) {
-                if (data.results.length == 0) {
-                    $('#no-comments-placeholder').toggleClass('invisible');
+            function init() {
+                if (currentUserId) {
+                    var panel = $('#new-comment-panel');
+                    panel.removeClass('invisible');
+                    $(panel).find('.parent-comment-reference').toggleClass('invisible');
+                    $('#new-comment-form').submit(addNewComment);
+                    $('#clear-reply-button').click(clearRecipient);
                 }
-
-                for (var i = 0; i < data.results.length; i++) {
-                    var item = data.results[i];
-                    addCommentItem(item);
-                }
-            });
-
-            if (currentUserId) {
-                var panel = $('#new-comment-panel');
-                panel.removeClass('invisible');
-                $(panel).find('.parent-comment-reference').toggleClass('invisible');
-                $('#new-comment-form').submit(addNewComment);
-                $('#clear-reply-button').click(clearRecipient);
             }
 
-            function highlightComment(e) {
+            function loadComments() {
+                $.get("{% url 'post_comments' post_pk=post.id %}", function (data) {
+                    if (data.results.length == 0) {
+                        $('#no-comments-placeholder').toggleClass('invisible');
+                    }
+
+                    for (var i = 0; i < data.results.length; i++) {
+                        var item = data.results[i];
+                        addCommentItem(item);
+                    }
+
+                    $('.loader').addClass('invisible');
+                    if (data.next == null) {
+                        $('.load-more').addClass('invisible')
+                    } else {
+                        $('.load-more').removeClass('invisible')
+                    }
+                });
+            }
+
+            function highlightCommentOnClick(e) {
                 var commentRef = $(e.target).attr('href');
+                highlightComment(commentRef);
+            }
+
+            function highlightComment(commentRef) {
                 $(commentRef).effect("highlight", {color: '#ffc060'}, 1000);
-            };
+            }
 
             function addCommentItem(item) {
                 var comment = new CommentModel(item);
@@ -136,7 +155,7 @@
                 if (comment.parentCommentId != null) {
                     parentCommentLink.text(comment.author.username);
                     parentCommentLink.attr('href', '#comment-' + comment.parentCommentId);
-                    parentCommentLink.click(highlightComment);
+                    parentCommentLink.click(highlightCommentOnClick);
                 } else {
                     $(template).find('.parent-comment-reference').addClass('invisible');
                 }
@@ -173,7 +192,7 @@
                 var parentCommentLink = newCommentPanel.find('.parent-comment-link');
                 parentCommentLink.attr('href', '#comment-' + targetId);
                 parentCommentLink.text(comments[targetId].author.username);
-                parentCommentLink.click(highlightComment);
+                parentCommentLink.click(highlightCommentOnClick);
                 newCommentPanel.find('.parent-comment-reference').removeClass('invisible');
 
                 newCommentPanel.effect("highlight", {color: '#ffc060'}, 1500);
@@ -195,15 +214,21 @@
                 $.ajax({
                     url: "{% url 'comments-list' %}",
                     data: {
-                        text: comment.text, 'parent_comment': comment.parentCommentId, 'post': postId,
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                        text: comment.text, 'parent_comment': comment.parentCommentId, 'post': postId
                     },
                     type: 'POST',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
                     success: function (result) {
                         addCommentItem(result);
+
                         $('#new-comment-text').val('');
                         clearRecipient();
                         $('#no-comments-placeholder').addClass('invisible');
+
+                        window.location.hash = '#comment-' + result.id;
+                        highlightComment($('#comment-' + result.id));
                     },
                     error: function (result) {
                         alert(result.responseText);
@@ -235,11 +260,12 @@
             };
 
             function getDateString(d) {
-                return d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear();
+                return ("0" + d.getDate()).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+                        d.getFullYear();
             }
 
             function getTime(d) {
-                return d.getHours() + ":" + d.getMinutes();
+                return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
             }
 
         }
