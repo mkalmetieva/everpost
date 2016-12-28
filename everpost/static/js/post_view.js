@@ -193,7 +193,7 @@ function CommentModel(data) {
             return null;
         }
         var dateString = getDateString(self.createdAt);
-        var timeString = getTime(self.createdAt);
+        var timeString = getTimeString(self.createdAt);
         return dateString == getDateString(new Date())
             ? timeString
             : dateString + " " + timeString;
@@ -204,7 +204,7 @@ function CommentModel(data) {
             d.getFullYear();
     }
 
-    function getTime(d) {
+    function getTimeString(d) {
         return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
     }
 

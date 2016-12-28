@@ -359,7 +359,7 @@ label:hover:before {
     padding-top: 2em;
 }
 
-.post_list {
+.posts-panel {
 
 }
 
@@ -367,9 +367,9 @@ label:hover:before {
     font-weight: bold;
 }
 
-.post_create_time {
+.post-time {
     display: block;
-    text-align: right;
+    float: right;
 }
 
 .post-text {
@@ -379,7 +379,7 @@ label:hover:before {
     margin-top: 1em;
 }
 
-.comment-panel {
+.comment-panel, .post-panel {
     border: 1px solid #aaaaaa;
     border-radius: 4px;
     background-color: #fff8ea;
@@ -387,8 +387,12 @@ label:hover:before {
     margin-top: 1em;
 }
 
-#comment-template {
+#post-template, #comment-template {
     display: none;
+}
+
+.post-title {
+    font-size: larger;
 }
 
 .invisible {

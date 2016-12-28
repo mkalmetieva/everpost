@@ -6,7 +6,6 @@ class Post(models.Model):
     text = models.TextField(max_length=16392, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    rating = models.IntegerField(default=0)
 
     author = models.ForeignKey('auth.User')
 
@@ -16,12 +15,6 @@ class Post(models.Model):
 
 class NicEditImage(models.Model):
     image = models.ImageField(upload_to='nicedit/')
-
-
-class PostMark(models.Model):
-    value = models.SmallIntegerField(default=0)
-    post = models.ForeignKey('main.Post')
-    author = models.ForeignKey('auth.User')
 
 
 class Comment(models.Model):

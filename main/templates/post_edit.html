@@ -26,9 +26,10 @@
                 textEditor = nicEditors.findEditor('id_text');
                 if (textEditor.getContent() != '<br>') {
                     $('#edit_form textarea').text(textEditor.getContent());
+                    return true;
                 }
+                return false;
             });
-            return true;
         });
     </script>
 {% endblock %}

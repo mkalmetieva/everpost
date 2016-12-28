@@ -17,9 +17,11 @@ class UserNameSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
+    author = UserNameSerializer(many=False, read_only=True)
+
     class Meta:
         model = Post
-        fields = ('title', 'text', 'author', 'rating')
+        fields = ('id', 'title', 'author', 'created_at')
 
 
 class CommentSerializer(serializers.ModelSerializer):

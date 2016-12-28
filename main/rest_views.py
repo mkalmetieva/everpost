@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.db import transaction
 from rest_framework import generics
 from rest_framework import mixins
@@ -5,8 +7,19 @@ from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 
-from main.models import Comment
-from main.serializers import CommentSerializer
+from main.models import Comment, Post
+from main.serializers import CommentSerializer, PostSerializer
+
+
+class PostListView(generics.ListAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        dateVal = self.kwargs['date']
+        dateMin = datetime.strptime(dateVal, '%d-%m-%Y').date()
+        dateMax = dateMin + timedelta(days=1)
+        return Post.objects.filter(created_at__gte=dateMin, created_at__lt=dateMax
+                                   ).order_by('created_at')
 
 
 class CommentsViewSet(mixins.CreateModelMixin,

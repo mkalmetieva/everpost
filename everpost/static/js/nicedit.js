@@ -589,7 +589,7 @@ var nicEditorInstance = bkClass.extend({
         newSnippet = newSnippet.replace(/<\/[^ >]+:[^>]*>/g, "");
 
         /* remove undwanted tags */
-        newSnippet = newSnippet.replace(/<(div|span|style|meta|link|p|code|a|h1|h2|h3|h4|h5|h6|pre|script){1}.*?>/gi,'');
+        newSnippet = newSnippet.replace(/<(div|span|style|meta|link|p|code|a|h1|h2|h3|h4|h5|h6|pre|script|table|th|th|td){1}.*?>/gi,'');
 
         this.content = matchedHead + newSnippet + matchedTail;
         this.ne.fireEvent("set",this);

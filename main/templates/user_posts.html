@@ -5,12 +5,13 @@
 
     <div class="post_list_section">
         {% if posts %}
-            <ul class="list-group post_list">
+            <ul class="list-group posts-panel">
                 {% for post in posts %}
-                    <li class="list-group-item">
+                    <li class="list-group-item post-panel">
                         <a href="{% url 'post_view' pk=post.id %}">
-                            <span class="post_title" >{{ post.title }} </span>
-                            <span class="post_create_time">{{ post.created_at }}</span></a>
+                            <span class="post-title">{{ post.title }} </span>
+                        </a>
+                        <span class="post-time">{{ post.created_at }}</span>
                     </li>
                 {% endfor %}
             </ul>
