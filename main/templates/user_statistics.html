@@ -18,12 +18,12 @@
         $(function () {
 
             $.get("{% url 'user_statistics' %}", function (data) {
-                {#                var usernames = data.results.map(item => item.username);#}
-                {#                var postCounts = data.results.map(item => item.count);          #}
-                var usernames = data.results.map(item => item.username
+                {#                var usernames = data.map(item => item.username);#}
+                {#                var postCounts = data.map(item => item.count);          #}
+                var usernames = data.map(item => item.username
                 )
                 ;
-                var postCounts = data.results.map(item => item.count
+                var postCounts = data.map(item => item.count
                 )
                 ;
 

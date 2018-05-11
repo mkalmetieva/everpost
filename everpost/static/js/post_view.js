@@ -18,8 +18,8 @@ $(function () {
 
     function loadComments() {
         $.get(Urls.MORE_COMMENTS, function (data) {
-            for (var i = 0; i < data.results.length; i++) {
-                var item = data.results[i];
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
                 addCommentItem(item);
             }
 

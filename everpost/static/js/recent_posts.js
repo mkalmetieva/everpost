@@ -33,8 +33,8 @@ $(function () {
                 dateChanged = false;
             }
 
-            for (var i = 0; i < data.results.length; i++) {
-                var item = data.results[i];
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
                 addPostItem(item);
             }
 

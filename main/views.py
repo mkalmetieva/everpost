@@ -8,11 +8,13 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
+from rest_framework.pagination import PageNumberPagination
 
 from main.forms import PostForm, NicEditImageForm
 from main.models import Post
 from main.utils import resize_if_needed
 
+DEFAULT_PAGINATION_CLASS = PageNumberPagination
 DEFAULT_PAGE_SIZE = 10
 
 logger = logging.getLogger('everpost.custom')
